@@ -1,1 +1,2187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rivals Admin • Canlı Yönetim Paneli</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(14, 18, 30, 0.78);
+      --card-hover: rgba(20, 26, 44, 0.78);
+      --surface-1: #0f1322;
+      --surface-2: #151b30;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --border-glow: rgba(99, 102, 241, 0.35);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --accent: #8b5cf6;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.2);
+      --amber: #f59e0b;
+      --sky: #0ea5e9;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.10) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .wrap {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--primary-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-text .version-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      text-transform: uppercase;
+    }
+
+    .brand-text .sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sync-widget {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 14, 25, 0.6);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .sync-btn {
+      background: none;
+      border: none;
+      color: #a5b4fc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .sync-btn:hover {
+      color: #fff;
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .sync-btn.spinning svg {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .pause-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+
+    .pause-toggle:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #c7d2fe;
+    }
+
+    .user-avatar-sm {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fca5a5;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(244, 63, 94, 0.18);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fff;
+    }
+
+    /* KPI Stats Row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2.5px;
+      background: var(--primary-grad);
+    }
+
+    .stat-card.emerald::after { background: linear-gradient(90deg, #10b981, #059669); }
+    .stat-card.rose::after { background: linear-gradient(90deg, #f43f5e, #e11d48); }
+    .stat-card.purple::after { background: linear-gradient(90deg, #8b5cf6, #6366f1); }
+    .stat-card.amber::after { background: linear-gradient(90deg, #f59e0b, #d97706); }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 700;
+    }
+
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-icon svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+    }
+
+    .stat-val {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .stat-subtext {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Tab Navigation */
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14, 18, 30, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--surface-2);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+    }
+
+    .tab-btn.active .tab-badge {
+      background: rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+    }
+
+    /* Content Cards */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.2px;
+    }
+
+    .card-title-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a5b4fc;
+    }
+
+    .card-title-icon svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* Filter & Search Bar */
+    .search-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(10, 14, 25, 0.7);
+      border: 1px solid var(--border);
+      color: #f8fafc;
+      padding: 10px 14px 10px 40px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(10, 14, 25, 0.95);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-filter {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .pill-filter:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .pill-filter.active {
+      background: rgba(99, 102, 241, 0.18);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
+    }
+
+    /* Table Styles */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: rgba(9, 12, 22, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 14px 16px;
+      background: rgba(14, 18, 30, 0.85);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+      color: #cbd5e1;
+    }
+
+    tr:hover td {
+      background: rgba(99, 102, 241, 0.04);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .user-name-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 700;
+      color: #fff;
+      font-size: 13.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .device-icon-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* Badges & Monospace Tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .badge.indigo {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      color: #a5b4fc;
+    }
+
+    .badge.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      color: #6ee7b7;
+    }
+
+    .badge.rose {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.28);
+      color: #fca5a5;
+    }
+
+    .badge.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      color: #fcd34d;
+    }
+
+    .badge.slate {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+    }
+
+    .copyable-badge {
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font-mono);
+    }
+
+    .copyable-badge:hover {
+      filter: brightness(1.2);
+      transform: translateY(-1px);
+    }
+
+    .mono-token {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+      animation: livePulse 2s infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes livePulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: var(--primary-grad);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-outline-primary {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+    }
+
+    .btn-outline-primary:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: #fff;
+    }
+
+    .btn-outline-danger {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fca5a5;
+    }
+
+    .btn-outline-danger:hover {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .actions-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Inputs, Textareas, Selects */
+    input, textarea, select {
+      background: rgba(10, 14, 25, 0.7);
+      color: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    }
+
+    textarea {
+      resize: vertical;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    /* 2 Columns Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px dashed rgba(99, 102, 241, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #818cf8;
+    }
+
+    .empty-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .empty-state h3 {
+      font-size: 15px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* Bypass Tag Chips */
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px;
+      background: rgba(9, 12, 22, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-height: 120px;
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #c7d2fe;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .tag-remove {
+      background: none;
+      border: none;
+      color: #818cf8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      border-radius: 50%;
+      transition: all 0.15s;
+    }
+
+    .tag-remove:hover {
+      color: #f43f5e;
+      background: rgba(244, 63, 94, 0.15);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.2s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: #0d1222;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      position: relative;
+      animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(18px) scale(0.97); }
+      to { transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background: rgba(10, 14, 25, 0.4);
+    }
+
+    .user-target-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .meta-box {
+      background: rgba(9, 12, 22, 0.6);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 12px;
+    }
+
+    .meta-box .lbl {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .meta-box .val {
+      font-size: 13px;
+      color: #fff;
+      font-family: var(--font-mono);
+      word-break: break-all;
+    }
+
+    .quick-reasons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+
+    .reason-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .reason-chip:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #c7d2fe;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-msg {
+      pointer-events: auto;
+      background: rgba(13, 18, 32, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 420px;
+      animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .toast-msg.success {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .toast-msg.error {
+      border-color: rgba(244, 63, 94, 0.4);
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toast-msg.success .toast-icon { color: #10b981; }
+    .toast-msg.error .toast-icon { color: #f43f5e; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .wrap { padding: 14px 12px 40px; }
+      .top-nav { flex-direction: column; gap: 14px; align-items: flex-start; }
+      .nav-controls { width: 100%; justify-content: space-between; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .tabs-bar { overflow-x: auto; }
+      .modal-card { margin: 10px; }
+      .user-meta-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+          <line x1="13" y1="19" x2="19" y2="13"></line>
+          <line x1="16" y1="16" x2="20" y2="20"></line>
+          <line x1="19" y1="21" x2="21" y2="19"></line>
+          <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline>
+          <line x1="5" y1="14" x2="9" y2="18"></line>
+          <line x1="7" y1="17" x2="4" y2="20"></line>
+          <line x1="3" y1="19" x2="5" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Rivals Backend <span class="version-tag">v4.2 PRO</span></h1>
+        <div class="sub">
+          <span class="live-pulse-dot"></span>
+          <span>Cloudflare D1 Canlı Konsol</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <div class="sync-widget">
+        <button class="sync-btn" id="refreshBtn" onclick="manualRefresh()" title="Şimdi Yenile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+        <span id="autoRefreshText">5s</span>
+        <button class="pause-toggle" id="pauseBtn" onclick="toggleAutoRefresh()" title="Otomatik Yenilemeyi Duraklat/Başlat">
+          <span id="pauseIcon">⏸️</span>
+        </button>
+      </div>
+
+      <div class="user-pill">
+        <div class="user-avatar-sm">__USER_INITIAL__</div>
+        <span>__USER__</span>
+      </div>
+
+      <a class="logout-btn" href="/admin/logout" title="Güvenli Çıkış Yap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Çıkış</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- KPI Stats Grid -->
+  <section class="stats-grid">
+    <div class="stat-card emerald">
+      <div class="stat-header">
+        <span class="stat-label">Aktif Kullanıcılar</span>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-val" id="statUsers">0</div>
+      <div class="stat-subtext" id="statDevices">
+        <span class="live-pulse-dot"></span> Canlı Oturumlar
+      </div>
+    </div>
+
+    <div class="stat-card rose">
+      <div class="stat-header">
+        <span class="stat-label">Yasaklı Hesaplar</span>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-val" id="statBans">0</div>
+      <div class="stat-subtext">Veritabanında Kalıcı Ban</div>
+    </div>
+
+    <div class="stat-card purple">
+      <div class="stat-header">
+        <span class="stat-label">Bypass Koruması</span>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-val" id="statBypass">0</div>
+      <div class="stat-subtext">Aimbot / ESP Muaf Kişi</div>
+    </div>
+
+    <div class="stat-card amber">
+      <div class="stat-header">
+        <span class="stat-label">Kayıtlı Konfigler</span>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-val" id="statConfigs">0</div>
+      <div class="stat-subtext">Bulut Kod Arşivi</div>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('users')">
+      <span>👥 Canlı Kullanıcılar</span>
+      <span class="tab-badge" id="badgeUsers">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('bypass')">
+      <span>🛡️ Bypass Koruması</span>
+      <span class="tab-badge" id="badgeBypass">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('bans')">
+      <span>⛔ Ban Yönetimi</span>
+      <span class="tab-badge" id="badgeBans">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('configs')">
+      <span>💾 Config Deposu</span>
+      <span class="tab-badge" id="badgeConfigs">0</span>
+    </button>
+  </nav>
+
+  <!-- TAB: USERS -->
+  <div class="tab-pane active" id="pane-users">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <span>Bağlı İstemciler & Canlı Oturumlar</span>
+        </div>
+      </div>
+
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input class="search-input" id="userSearch" placeholder="Kullanıcı adı, UID veya Session ara..." oninput="renderUsers()">
+        </div>
+
+        <div class="filter-pills">
+          <button class="pill-filter active" id="filterAll" onclick="setUserFilter('all')">Tümü</button>
+          <button class="pill-filter" id="filterPC" onclick="setUserFilter('pc')">💻 Masaüstü</button>
+          <button class="pill-filter" id="filterMobile" onclick="setUserFilter('mobile')">📱 Mobil</button>
+          <button class="pill-filter" id="filterLive" onclick="setUserFilter('live')">🟢 Sadece Canlı (&lt;10s)</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div id="usersTableWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: BYPASS -->
+  <div class="tab-pane" id="pane-bypass">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <span>Bypass Listesi (Etiket Görünümü)</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="copyAllBypass()">📋 Kopyala</button>
+        </div>
+        <p style="color:var(--text-muted);font-size:12.5px;margin-bottom:14px;line-height:1.5">
+          Bu listedeki kullanıcılara hiçbir istemcide <b style="color:#a5b4fc">aimbot, silent aim, snapline ve ESP</b> hedeflenemez.
+        </p>
+
+        <div class="tag-container" id="bypassTags"></div>
+
+        <div style="display:flex;gap:10px;">
+          <input id="singleBypassInput" placeholder="Kullanıcı adı veya UserID yaz..." style="flex:1" onkeydown="if(event.key==='Enter')addSingleBypass()">
+          <button class="btn btn-primary" onclick="addSingleBypass()">➕ Ekle</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </div>
+            <span>Toplu Düzenleyici & İçe Aktar</span>
+          </div>
+        </div>
+        <p style="color:var(--text-muted);font-size:12.5px;margin-bottom:14px;line-height:1.5">
+          İsimleri veya UserId'leri virgülle ayırarak hızlıca yapıştırın veya düzenleyin.
+        </p>
+        <textarea id="bypassInput" rows="7" placeholder="user1, user2, 12345678, user3"></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+          <button class="btn btn-secondary" onclick="loadBypass()">Geri Al / Yenile</button>
+          <button class="btn btn-primary" onclick="saveBypass()">💾 Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: BANS -->
+  <div class="tab-pane" id="pane-bans">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+          </div>
+          <span>Yasaklı Kullanıcılar (Bans)</span>
+        </div>
+        <button class="btn btn-danger" onclick="openNewBanModal()">➕ Yeni Ban Ekle</button>
+      </div>
+
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input class="search-input" id="banSearch" placeholder="Banlı User ID veya sebep ara..." oninput="renderBans()">
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div id="bansTableWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: CONFIGS -->
+  <div class="tab-pane" id="pane-configs">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+          </div>
+          <span>Bulut Konfigürasyon Arşivi</span>
+        </div>
+      </div>
+
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input class="search-input" id="configSearch" placeholder="Config kodu veya adı ara..." oninput="renderConfigs()">
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div id="configsTableWrap"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: COMMAND RUNNER -->
+<div class="modal-overlay" id="cmdModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>⚡ Komut Konsolu</h3>
+      <button class="modal-close-btn" onclick="closeModal('cmdModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="user-target-banner">
+        <div class="user-avatar" id="cmdAvatar" style="background:#6366f1">R</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#fff" id="cmdUsername">Username</div>
+          <div style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono)" id="cmdSession">session_123</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:8px">
+          👢 Kick İşlemi
+        </label>
+        <div style="display:flex;gap:10px">
+          <input id="kickReasonInput" placeholder="Sebep (opsiyonel)" style="flex:1" value="Admin tarafından atıldınız">
+          <button class="btn btn-danger" onclick="sendKick()">Kickle</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:8px">
+          🐌 Gecikme (Lag) Simülasyonu
+        </label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="sendLag(5)">5 Saniye</button>
+          <button class="btn btn-secondary btn-sm" onclick="sendLag(10)">10 Saniye</button>
+          <button class="btn btn-secondary btn-sm" onclick="sendLag(30)">30 Saniye</button>
+          <button class="btn btn-secondary btn-sm" onclick="sendLag(60)">60 Saniye</button>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:8px">
+          🚫 Modül Devre Dışı Bırakma
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-outline-danger btn-sm" onclick="sendDisable('aimbot')">Aimbot Kapat</button>
+          <button class="btn btn-outline-danger btn-sm" onclick="sendDisable('silent')">Silent Aim Kapat</button>
+          <button class="btn btn-outline-danger btn-sm" onclick="sendDisable('snap')">Snap Line Kapat</button>
+          <button class="btn btn-outline-danger btn-sm" onclick="sendDisable('trigger')">TriggerBot Kapat</button>
+          <button class="btn btn-danger btn-sm" style="grid-column:span 2" onclick="sendDisable('all')">🔥 TÜM MODÜLLERİ KAPAT</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('cmdModal')">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: BAN USER -->
+<div class="modal-overlay" id="banModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>⛔ Kullanıcıyı Yasakla</h3>
+      <button class="modal-close-btn" onclick="closeModal('banModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:#cbd5e1">Roblox User ID *</label>
+        <input id="banUserIdInput" placeholder="Örn: 123456789" style="width:100%">
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:#cbd5e1">Kullanıcı Adı (Opsiyonel)</label>
+        <input id="banUsernameInput" placeholder="Örn: Player1" style="width:100%">
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:#cbd5e1">Yasaklama Sebebi</label>
+        <div class="quick-reasons">
+          <span class="reason-chip" onclick="setBanReason('⚔️ Hile İstismarı')">⚔️ Hile İstismarı</span>
+          <span class="reason-chip" onclick="setBanReason('🚫 Admin Kararı')">🚫 Admin Kararı</span>
+          <span class="reason-chip" onclick="setBanReason('🛡️ Güvenlik İhlali')">🛡️ Güvenlik İhlali</span>
+          <span class="reason-chip" onclick="setBanReason('⚠️ Şüpheli Davranış')">⚠️ Şüpheli Davranış</span>
+        </div>
+        <input id="banReasonInput" placeholder="Yasaklama sebebi yazın..." style="width:100%" value="Banned by admin">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('banModal')">İptal</button>
+      <button class="btn btn-danger" onclick="submitBan()">Yasaklamayı Onayla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: USER DETAILS INSPECTOR -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-card" style="max-width:620px">
+    <div class="modal-header">
+      <h3>🔍 Kullanıcı Detayları</h3>
+      <button class="modal-close-btn" onclick="closeModal('userModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="user-meta-grid" id="userMetaGrid"></div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px">
+          Ham JSON Kaydı
+        </label>
+        <textarea id="rawUserJson" rows="6" readonly style="width:100%;font-size:12px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="copyRawUserJson()">📋 JSON Kopyala</button>
+      <button class="btn btn-primary" onclick="closeModal('userModal')">Tamam</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIG INSPECTOR -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal-card" style="max-width:620px">
+    <div class="modal-header">
+      <h3 id="configModalTitle">📦 Config Detayı</h3>
+      <button class="modal-close-btn" onclick="closeModal('configModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="rawConfigJson" rows="12" readonly style="width:100%;font-size:12px"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="copyRawConfigJson()">📋 JSON Kopyala</button>
+      <button class="btn btn-primary" onclick="closeModal('configModal')">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastBox"></div>
+
+<script>
+const API = "/admin/api";
+let cache = { users: [], bans: [], bypass: [], configs: [] };
+let activeFilter = "all";
+let autoRefresh = true;
+let refreshTimer = null;
+let currentCmdSession = null;
+let currentCmdUserId = null;
+let currentInspectUser = null;
+
+// -------- Toast Engine --------
+function toast(msg, type = "success") {
+  const box = document.getElementById("toastBox");
+  const el = document.createElement("div");
+  el.className = "toast-msg " + type;
+  const icon = type === "error"
+    ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    : '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  el.innerHTML = icon + '<span>' + esc(msg) + '</span>';
+  box.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(10px)";
+    setTimeout(() => el.remove(), 250);
+  }, 2600);
+}
+
+// -------- Helpers --------
+async function api(p, opt) {
+  try {
+    const res = await fetch(API + p, opt);
+    return await res.json();
+  } catch (e) {
+    toast("Sunucu hatası: " + e.message, "error");
+    return {};
+  }
+}
+
+const post = (p, b) => api(p, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(b || {})
+});
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g,
+    c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function ago(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  if (s < 60) return s + " sn";
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + " dk";
+  return Math.floor(m / 60) + " sa";
+}
+
+function copyText(txt, label = "Metin") {
+  navigator.clipboard.writeText(txt).then(() => {
+    toast(label + " panoya kopyalandı!");
+  }).catch(() => {
+    toast("Kopyalama başarısız", "error");
+  });
+}
+
+function getAvatarColor(str) {
+  const colors = [
+    "linear-gradient(135deg, #6366f1, #8b5cf6)",
+    "linear-gradient(135deg, #3b82f6, #06b6d4)",
+    "linear-gradient(135deg, #10b981, #059669)",
+    "linear-gradient(135deg, #f59e0b, #d97706)",
+    "linear-gradient(135deg, #ec4899, #f43f5e)",
+    "linear-gradient(135deg, #8b5cf6, #d946ef)"
+  ];
+  let h = 0;
+  for (let i = 0; i < (str || "").length; i++) h += str.charCodeAt(i);
+  return colors[h % colors.length];
+}
+
+// -------- Modal Controls --------
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.add("active");
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.remove("active");
+}
+
+// -------- Tab Switching --------
+function switchTab(name) {
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  const targetPane = document.getElementById("pane-" + name);
+  if (targetPane) targetPane.classList.add("active");
+  const btns = document.querySelectorAll(".tab-btn");
+  if (name === "users" && btns[0]) btns[0].classList.add("active");
+  if (name === "bypass" && btns[1]) btns[1].classList.add("active");
+  if (name === "bans" && btns[2]) btns[2].classList.add("active");
+  if (name === "configs" && btns[3]) btns[3].classList.add("active");
+}
+
+// -------- Auto Refresh Engine --------
+function toggleAutoRefresh() {
+  autoRefresh = !autoRefresh;
+  document.getElementById("pauseIcon").textContent = autoRefresh ? "⏸️" : "▶️";
+  document.getElementById("autoRefreshText").textContent = autoRefresh ? "5s" : "Durdu";
+  toast(autoRefresh ? "Otomatik yenileme aktif" : "Otomatik yenileme duraklatıldı");
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
+  await refreshAll();
+  setTimeout(() => btn.classList.remove("spinning"), 600);
+  toast("Veriler güncellendi");
+}
+
+async function refreshAll() {
+  await Promise.all([loadUsers(), loadBypass(), loadBans(), loadConfigs()]);
+}
+
+// -------- Users Management --------
+async function loadUsers() {
+  const d = await api("/users");
+  cache.users = d.users || [];
+  document.getElementById("statUsers").textContent = cache.users.length;
+  document.getElementById("badgeUsers").textContent = cache.users.length;
+  
+  // Platform stats
+  let pc = 0, mob = 0;
+  for (const u of cache.users) {
+    if (u.is_mobile) mob++; else pc++;
+  }
+  document.getElementById("statDevices").innerHTML = '<span class="live-pulse-dot"></span> ' + pc + ' Masaüstü • ' + mob + ' Mobil';
+  renderUsers();
+}
+
+function setUserFilter(type) {
+  activeFilter = type;
+  document.querySelectorAll(".pill-filter").forEach(p => p.classList.remove("active"));
+  if (type === "all") document.getElementById("filterAll").classList.add("active");
+  if (type === "pc") document.getElementById("filterPC").classList.add("active");
+  if (type === "mobile") document.getElementById("filterMobile").classList.add("active");
+  if (type === "live") document.getElementById("filterLive").classList.add("active");
+  renderUsers();
+}
+
+function renderUsers() {
+  const wrap = document.getElementById("usersTableWrap");
+  const q = (document.getElementById("userSearch").value || "").toLowerCase().trim();
+  const now = Date.now();
+
+  const filtered = cache.users.filter(u => {
+    // Search filter
+    const matchesSearch = !q ||
+      (u.username && u.username.toLowerCase().includes(q)) ||
+      (u.user_id && String(u.user_id).includes(q)) ||
+      (u.session && u.session.toLowerCase().includes(q)) ||
+      (u.job_id && u.job_id.toLowerCase().includes(q));
+
+    if (!matchesSearch) return false;
+
+    // Platform filter
+    if (activeFilter === "pc" && u.is_mobile) return false;
+    if (activeFilter === "mobile" && !u.is_mobile) return false;
+    if (activeFilter === "live" && (now - u.last_seen > 10000)) return false;
+
+    return true;
+  });
+
+  if (!filtered.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Aktif Kullanıcı Bulunamadı</h3>
+        <p>Arama kriterlerine uyan veya şu an bağlı olan kullanıcı yok.</p>
+      </div>`;
+    return;
+  }
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Kullanıcı</th>
+        <th>User ID</th>
+        <th>Session Token</th>
+        <th>Roblox Sunucusu</th>
+        <th>Versiyon</th>
+        <th>Son Görülme</th>
+        <th style="text-align:right">İşlemler</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  for (const u of filtered) {
+    const isLive = (now - u.last_seen) < 8000;
+    const initial = (u.username || "U")[0].toUpperCase();
+    const avatarBg = getAvatarColor(u.username || "");
+    const deviceIcon = u.is_mobile ? "📱 Mobil" : "💻 Masaüstü";
+    const shortSession = u.session ? (u.session.slice(0, 8) + "...") : "-";
+    const placeJob = u.place_id ? ("P: " + u.place_id) : "-";
+
+    html += `<tr>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar" style="background:${avatarBg}">${esc(initial)}</div>
+          <div class="user-name-box">
+            <span class="user-name">${esc(u.username || "Bilinmiyor")}</span>
+            <span class="device-icon-tag">${deviceIcon}</span>
+          </div>
+        </div>
+      </td>
+      <td>
+        <span class="badge indigo copyable-badge" onclick="copyText('${esc(u.user_id)}', 'User ID')">
+          ${esc(u.user_id || "-")}
+        </span>
+      </td>
+      <td>
+        <span class="badge slate copyable-badge" title="Tıkla ve Kopyala: ${esc(u.session)}" onclick="copyText('${esc(u.session)}', 'Session')">
+          ${esc(shortSession)}
+        </span>
+      </td>
+      <td>
+        <span class="badge slate copyable-badge" title="Tıkla ve Kopyala: Place ${esc(u.place_id)}" onclick="copyText('${esc(u.place_id)}', 'Place ID')">
+          ${esc(placeJob)}
+        </span>
+      </td>
+      <td>
+        <span class="badge amber">${esc(u.version || "v1.0")}</span>
+      </td>
+      <td>
+        ${isLive ? '<span class="live-pulse-dot"></span>' : ''}
+        <span style="color:#94a3b8;font-size:12.5px">${ago(now - u.last_seen)} önce</span>
+      </td>
+      <td style="text-align:right">
+        <div class="actions-cluster" style="justify-content:flex-end">
+          <button class="btn btn-outline-primary btn-sm" onclick="openCmdModal('${esc(u.session)}','${esc(u.username)}','${esc(u.user_id)}')">
+            ⚡ Komut
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="inspectUser('${esc(u.session)}')">
+            🔍 Detay
+          </button>
+          <button class="btn btn-outline-danger btn-sm" onclick="quickBanUser('${esc(u.user_id)}','${esc(u.username)}')">
+            ⛔ Ban
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+// -------- Command Runner Modal --------
+function openCmdModal(session, username, uid) {
+  currentCmdSession = session;
+  currentCmdUserId = uid;
+  document.getElementById("cmdUsername").textContent = username || "Kullanıcı";
+  document.getElementById("cmdSession").textContent = session;
+  document.getElementById("cmdAvatar").textContent = (username || "U")[0].toUpperCase();
+  document.getElementById("cmdAvatar").style.background = getAvatarColor(username);
+  openModal("cmdModal");
+}
+
+async function sendKick() {
+  const reason = document.getElementById("kickReasonInput").value.trim() || "Kicked by admin";
+  await post("/kick", { session: currentCmdSession, reason });
+  toast("👢 Kick gönderildi: " + reason);
+  closeModal("cmdModal");
+}
+
+async function sendLag(duration) {
+  await post("/lag", { session: currentCmdSession, duration });
+  toast("🐌 Lag gönderildi: " + duration + " saniye");
+  closeModal("cmdModal");
+}
+
+async function sendDisable(what) {
+  await post("/disable", { session: currentCmdSession, what });
+  toast("🚫 Devre dışı bırakma gönderildi: " + what);
+  closeModal("cmdModal");
+}
+
+// -------- User Inspector Modal --------
+function inspectUser(session) {
+  const u = cache.users.find(x => x.session === session);
+  if (!u) return toast("Kullanıcı bulunamadı", "error");
+  currentInspectUser = u;
+
+  const now = Date.now();
+  const grid = document.getElementById("userMetaGrid");
+  grid.innerHTML = `
+    <div class="meta-box">
+      <div class="lbl">Kullanıcı Adı</div>
+      <div class="val" style="color:#fff">${esc(u.username)}</div>
+    </div>
+    <div class="meta-box">
+      <div class="lbl">Roblox User ID</div>
+      <div class="val">
+        <a href="https://www.roblox.com/users/${esc(u.user_id)}/profile" target="_blank" style="color:#818cf8;text-decoration:none">
+          ${esc(u.user_id)} ↗
+        </a>
+      </div>
+    </div>
+    <div class="meta-box">
+      <div class="lbl">Platform</div>
+      <div class="val">${u.is_mobile ? '📱 Mobil' : '💻 Masaüstü'}</div>
+    </div>
+    <div class="meta-box">
+      <div class="lbl">Sürüm</div>
+      <div class="val">${esc(u.version || "-")}</div>
+    </div>
+    <div class="meta-box" style="grid-column:span 2">
+      <div class="lbl">Session Token</div>
+      <div class="val">${esc(u.session)}</div>
+    </div>
+    <div class="meta-box" style="grid-column:span 2">
+      <div class="lbl">HWID (Donanım Kimliği)</div>
+      <div class="val">${esc(u.hwid || "Belirtilmemiş")}</div>
+    </div>
+    <div class="meta-box">
+      <div class="lbl">Place ID</div>
+      <div class="val">${esc(u.place_id || "-")}</div>
+    </div>
+    <div class="meta-box">
+      <div class="lbl">Job ID</div>
+      <div class="val">${esc(u.job_id || "-")}</div>
+    </div>
+    <div class="meta-box" style="grid-column:span 2">
+      <div class="lbl">Son Kalp Atışı (Heartbeat)</div>
+      <div class="val">${new Date(u.last_seen).toLocaleString("tr-TR")} (${ago(now - u.last_seen)} önce)</div>
+    </div>
+  `;
+
+  document.getElementById("rawUserJson").value = JSON.stringify(u, null, 2);
+  openModal("userModal");
+}
+
+function copyRawUserJson() {
+  if (currentInspectUser) {
+    copyText(JSON.stringify(currentInspectUser, null, 2), "Kullanıcı JSON");
+  }
+}
+
+// -------- Bypass Management --------
+async function loadBypass() {
+  const d = await api("/bypass");
+  cache.bypass = d.list || [];
+  document.getElementById("statBypass").textContent = cache.bypass.length;
+  document.getElementById("badgeBypass").textContent = cache.bypass.length;
+  document.getElementById("bypassInput").value = cache.bypass.join(", ");
+  renderBypassTags();
+}
+
+function renderBypassTags() {
+  const container = document.getElementById("bypassTags");
+  if (!cache.bypass.length) {
+    container.innerHTML = '<div style="color:var(--text-dim);font-size:13px;padding:10px">Henüz bypass listesinde kimse yok.</div>';
+    return;
+  }
+  let h = "";
+  for (let i = 0; i < cache.bypass.length; i++) {
+    const k = cache.bypass[i];
+    h += `<span class="tag-chip">
+      <span>${esc(k)}</span>
+      <button class="tag-remove" onclick="removeBypassTag(${i})" title="Sil">✕</button>
+    </span>`;
+  }
+  container.innerHTML = h;
+}
+
+async function removeBypassTag(idx) {
+  cache.bypass.splice(idx, 1);
+  renderBypassTags();
+  document.getElementById("bypassInput").value = cache.bypass.join(", ");
+  await post("/bypass", { list: cache.bypass });
+  document.getElementById("statBypass").textContent = cache.bypass.length;
+  document.getElementById("badgeBypass").textContent = cache.bypass.length;
+  toast("Kişi bypass listesinden kaldırıldı");
+}
+
+async function addSingleBypass() {
+  const inp = document.getElementById("singleBypassInput");
+  const val = inp.value.trim();
+  if (!val) return toast("Bir isim veya ID girin", "error");
+  if (cache.bypass.includes(val)) return toast("Bu kişi zaten listede", "error");
+  cache.bypass.push(val);
+  inp.value = "";
+  renderBypassTags();
+  document.getElementById("bypassInput").value = cache.bypass.join(", ");
+  await post("/bypass", { list: cache.bypass });
+  document.getElementById("statBypass").textContent = cache.bypass.length;
+  document.getElementById("badgeBypass").textContent = cache.bypass.length;
+  toast("🛡️ " + val + " bypass listesine eklendi");
+}
+
+async function saveBypass() {
+  const raw = document.getElementById("bypassInput").value;
+  const list = raw.split(",").map(s => s.trim()).filter(Boolean);
+  await post("/bypass", { list });
+  cache.bypass = list;
+  document.getElementById("statBypass").textContent = list.length;
+  document.getElementById("badgeBypass").textContent = list.length;
+  renderBypassTags();
+  toast("🛡️ " + list.length + " kişi başarıyla kaydedildi");
+}
+
+function copyAllBypass() {
+  copyText(cache.bypass.join(", "), "Bypass Listesi");
+}
+
+// -------- Bans Management --------
+async function loadBans() {
+  const d = await api("/bans");
+  cache.bans = d.bans || [];
+  document.getElementById("statBans").textContent = cache.bans.length;
+  document.getElementById("badgeBans").textContent = cache.bans.length;
+  renderBans();
+}
+
+function renderBans() {
+  const wrap = document.getElementById("bansTableWrap");
+  const q = (document.getElementById("banSearch").value || "").toLowerCase().trim();
+
+  const filtered = cache.bans.filter(b => {
+    return !q ||
+      (b.user_id && String(b.user_id).includes(q)) ||
+      (b.username && b.username.toLowerCase().includes(q)) ||
+      (b.reason && b.reason.toLowerCase().includes(q));
+  });
+
+  if (!filtered.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <h3>Yasaklı Kullanıcı Yok</h3>
+        <p>Veritabanında kayıtlı herhangi bir ban bulunmuyor.</p>
+      </div>`;
+    return;
+  }
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Roblox User ID</th>
+        <th>Kullanıcı Adı</th>
+        <th>Sebep</th>
+        <th>Ban Tarihi</th>
+        <th style="text-align:right">İşlem</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  for (const b of filtered) {
+    html += `<tr>
+      <td>
+        <span class="badge rose copyable-badge" onclick="copyText('${esc(b.user_id)}', 'User ID')">
+          ${esc(b.user_id)}
+        </span>
+      </td>
+      <td>
+        <b style="color:#fff">${esc(b.username || "-")}</b>
+      </td>
+      <td>
+        <span class="badge slate">${esc(b.reason || "Banned by admin")}</span>
+      </td>
+      <td style="color:#94a3b8;font-size:12.5px">
+        ${b.banned_at ? new Date(b.banned_at).toLocaleString("tr-TR") : "-"}
+      </td>
+      <td style="text-align:right">
+        <button class="btn btn-outline-danger btn-sm" onclick="unbanUser('${esc(b.user_id)}')">
+          Yasağı Kaldır
+        </button>
+      </td>
+    </tr>`;
+  }
+
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+function openNewBanModal() {
+  document.getElementById("banUserIdInput").value = "";
+  document.getElementById("banUsernameInput").value = "";
+  document.getElementById("banReasonInput").value = "Banned by admin";
+  openModal("banModal");
+}
+
+function quickBanUser(uid, username) {
+  document.getElementById("banUserIdInput").value = uid || "";
+  document.getElementById("banUsernameInput").value = username || "";
+  document.getElementById("banReasonInput").value = "Hile İstismarı";
+  openModal("banModal");
+}
+
+function setBanReason(r) {
+  document.getElementById("banReasonInput").value = r;
+}
+
+async function submitBan() {
+  const uid = document.getElementById("banUserIdInput").value.trim();
+  const username = document.getElementById("banUsernameInput").value.trim();
+  const reason = document.getElementById("banReasonInput").value.trim() || "Banned by admin";
+
+  if (!uid) return toast("Lütfen Roblox User ID girin", "error");
+
+  await post("/ban", { userId: uid, username, reason });
+  toast("⛔ " + uid + " başarıyla yasaklandı");
+  closeModal("banModal");
+  await loadBans();
+}
+
+async function unbanUser(uid) {
+  if (!confirm(uid + " ID'li kullanıcının yasağını kaldırmak istiyor musunuz?")) return;
+  await post("/unban", { userId: uid });
+  toast("Ban kaldırıldı: " + uid);
+  await loadBans();
+}
+
+// -------- Configs Management --------
+async function loadConfigs() {
+  const d = await api("/configs");
+  cache.configs = d.configs || [];
+  document.getElementById("statConfigs").textContent = cache.configs.length;
+  document.getElementById("badgeConfigs").textContent = cache.configs.length;
+  renderConfigs();
+}
+
+function renderConfigs() {
+  const wrap = document.getElementById("configsTableWrap");
+  const q = (document.getElementById("configSearch").value || "").toLowerCase().trim();
+
+  const filtered = cache.configs.filter(c => {
+    return !q ||
+      (c.code && c.code.toLowerCase().includes(q)) ||
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.by_user && c.by_user.toLowerCase().includes(q));
+  });
+
+  if (!filtered.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3>Kayıtlı Config Yok</h3>
+        <p>Henüz buluta yüklenmiş bir konfigürasyon profili bulunmuyor.</p>
+      </div>`;
+    return;
+  }
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Kod</th>
+        <th>Config Adı</th>
+        <th>Oluşturan</th>
+        <th>Kayıt Tarihi</th>
+        <th style="text-align:right">İşlem</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  for (const c of filtered) {
+    html += `<tr>
+      <td>
+        <span class="badge indigo copyable-badge" style="font-size:12.5px" onclick="copyText('${esc(c.code)}', 'Config Kodu')">
+          ${esc(c.code)}
+        </span>
+      </td>
+      <td>
+        <b style="color:#fff">${esc(c.name || "Varsayılan")}</b>
+      </td>
+      <td>
+        <span class="badge slate">${esc(c.by_user || "Anonim")}</span>
+      </td>
+      <td style="color:#94a3b8;font-size:12.5px">
+        ${c.created_at ? new Date(c.created_at).toLocaleString("tr-TR") : "-"}
+      </td>
+      <td style="text-align:right">
+        <button class="btn btn-secondary btn-sm" onclick="inspectConfig('${esc(c.code)}','${esc(c.name)}')">
+          📦 JSON İncele
+        </button>
+      </td>
+    </tr>`;
+  }
+
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+let loadedConfigData = null;
+async function inspectConfig(code, name) {
+  try {
+    const res = await fetch("/load-config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code })
+    });
+    const d = await res.json();
+    if (!d.ok) return toast("Config verisi okunamadı: " + (d.error || ""), "error");
+    loadedConfigData = d.config;
+    document.getElementById("configModalTitle").textContent = "📦 " + (name || code) + " (" + code + ")";
+    document.getElementById("rawConfigJson").value = JSON.stringify(d.config, null, 2);
+    openModal("configModal");
+  } catch (e) {
+    toast("Config yüklenirken hata: " + e.message, "error");
+  }
+}
+
+function copyRawConfigJson() {
+  if (loadedConfigData) {
+    copyText(JSON.stringify(loadedConfigData, null, 2), "Config JSON");
+  }
+}
+
+// -------- Init & Timers --------
+refreshAll();
+
+refreshTimer = setInterval(() => {
+  if (autoRefresh) {
+    loadUsers();
+  }
+}, 5000);
+
+setInterval(() => {
+  if (autoRefresh) {
+    loadBans();
+    loadConfigs();
+  }
+}, 15000);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4039ec07f9f4131',t:'MTc5MDI3MjEwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
